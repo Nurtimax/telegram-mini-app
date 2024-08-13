@@ -66,7 +66,7 @@ const ProductList = () => {
          totalPrice: getTotalPrice(addedItems),
          queryId
       }
-      fetch("https://node-telegram-app-mini.vercel.app/web-data", {
+      fetch("https://node-telegram-app-mini.vercel.app/api/web-data", {
          method: "POST",
          headers: {
             "Content-Type": "application/json"
