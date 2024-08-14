@@ -7,6 +7,21 @@ import Button from "../Button/Button"
 import SelectDemo from "../ui/Select"
 import {Card} from "../ui/card"
 
+const horoscopeKeys = {
+   aries: "овен",
+   taurus: "телец",
+   gemini: "близнецы",
+   cancer: "рак",
+   leo: "лев",
+   virgo: "дева",
+   libra: "весы",
+   scorpio: "скорпион",
+   sagittarius: "стрелец",
+   capricorn: "козерог",
+   aquarius: "водолей",
+   pisces: "рыбы"
+}
+
 const getTotalPrice = (items = []) => {
    return items.reduce((acc, item) => (acc += item.price), 0)
 }
@@ -63,8 +78,13 @@ const ProductList = () => {
                {horoscopes.horoscopes &&
                   Object.keys(horoscopes.horoscopes).map(zodiac => (
                      <li key={zodiac}>
-                        <Button onClick={() => handleZodiacClick(zodiac)}>
-                           {zodiac}
+                        <Button
+                           className="block  border-r-2"
+                           onClick={() => handleZodiacClick(zodiac)}
+                        >
+                           {horoscope.language === "translated"
+                              ? zodiac
+                              : horoscopeKeys?.[zodiac]}
                         </Button>
                      </li>
                   ))}
