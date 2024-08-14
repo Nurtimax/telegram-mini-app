@@ -66,10 +66,15 @@ const ProductList = () => {
 
    return (
       <div className="product-list-wrapper">
-         <SelectDemo handleChange={handleChange} value={horoscope.language} />
+         <div className="my-4">
+            <SelectDemo
+               handleChange={handleChange}
+               value={horoscope.language}
+            />
+         </div>
 
          {selectedZodiac ? (
-            <Card className="zodiac-description" {...handlers}>
+            <Card className="zodiac-description p-4" {...handlers}>
                <Button onClick={handleBackClick}>Назад</Button>
                <p>{horoscopes.horoscopes[selectedZodiac]}</p>
             </Card>
