@@ -1,114 +1,75 @@
-import React, {useState} from "react"
+import React, {useState, useCallback, useEffect} from "react"
 import "./ProductList.css"
-import ProductItem from "../ProductItem/ProductItem"
-import {useTelegram} from "../../hooks/useTelegram"
-import {useCallback, useEffect} from "react"
+import axios from "axios"
+import {useSwipeable} from "react-swipeable"
 
-const products = [
-   {id: "1", title: "Джинсы", price: 5000, description: "Синего цвета, прямые"},
-   {
-      id: "2",
-      title: "Куртка",
-      price: 12000,
-      description: "Зеленого цвета, теплая"
-   },
-   {
-      id: "3",
-      title: "Джинсы 2",
-      price: 5000,
-      description: "Синего цвета, прямые"
-   },
-   {
-      id: "4",
-      title: "Куртка 8",
-      price: 122,
-      description: "Зеленого цвета, теплая"
-   },
-   {
-      id: "5",
-      title: "Джинсы 3",
-      price: 5000,
-      description: "Синего цвета, прямые"
-   },
-   {
-      id: "6",
-      title: "Куртка 7",
-      price: 600,
-      description: "Зеленого цвета, теплая"
-   },
-   {
-      id: "7",
-      title: "Джинсы 4",
-      price: 5500,
-      description: "Синего цвета, прямые"
-   },
-   {
-      id: "8",
-      title: "Куртка 5",
-      price: 12000,
-      description: "Зеленого цвета, теплая"
-   }
-]
+import Button from "../Button/Button"
+import SelectDemo from "../ui/Select"
+import {Card} from "../ui/card"
 
 const getTotalPrice = (items = []) => {
-   return items.reduce((acc, item) => {
-      return (acc += item.price)
-   }, 0)
+   return items.reduce((acc, item) => (acc += item.price), 0)
 }
 
 const ProductList = () => {
    const [addedItems, setAddedItems] = useState([])
-   const {tg, queryId} = useTelegram()
+   const [horoscope, setHoroscope] = useState({language: "original"})
+   const [horoscopes, setHoroscopes] = useState({})
+   const [selectedZodiac, setSelectedZodiac] = useState(null)
 
-   const onSendData = useCallback(() => {
-      const data = {
-         products: addedItems,
-         totalPrice: getTotalPrice(addedItems),
-         queryId
-      }
-      fetch("https://node-telegram-app-mini.vercel.app/api/web-data", {
-         method: "POST",
-         headers: {
-            "Content-Type": "application/json"
-         },
-         body: JSON.stringify(data)
-      })
-   }, [addedItems])
-
-   useEffect(() => {
-      tg.onEvent("mainButtonClicked", onSendData)
-      return () => {
-         tg.offEvent("mainButtonClicked", onSendData)
-      }
-   }, [onSendData])
-
-   const onAdd = product => {
-      const alreadyAdded = addedItems.find(item => item.id === product.id)
-      let newItems = []
-
-      if (alreadyAdded) {
-         newItems = addedItems.filter(item => item.id !== product.id)
-      } else {
-         newItems = [...addedItems, product]
-      }
-
-      setAddedItems(newItems)
-
-      if (newItems.length === 0) {
-         tg.MainButton.hide()
-      } else {
-         tg.MainButton.show()
-         tg.MainButton.setParams({
-            text: `Купить ${getTotalPrice(newItems)}`
-         })
+   const getHoroscope = async () => {
+      try {
+         const {data} = await axios.post(
+            "https://poker247tech.ru/get_horoscope/",
+            horoscope
+         )
+         setHoroscopes(data)
+      } catch (error) {
+         console.error("Error fetching horoscope data:", error)
       }
    }
 
+   useEffect(() => {
+      getHoroscope()
+   }, [horoscope])
+
+   const handleZodiacClick = zodiac => {
+      setSelectedZodiac(zodiac)
+   }
+
+   const handleBackClick = () => {
+      setSelectedZodiac(null)
+   }
+
+   const handlers = useSwipeable({
+      onSwipedRight: () => setSelectedZodiac(null)
+   })
+
+   const handleChange = newValue => {
+      setHoroscope(prev => ({...prev, language: newValue}))
+   }
+
    return (
-      <div className={"list"}>
-         {products.map(item => (
-            <ProductItem product={item} onAdd={onAdd} className={"item"} />
-         ))}
+      <div className="product-list-wrapper">
+         <SelectDemo handleChange={handleChange} value={horoscope.language} />
+
+         {selectedZodiac ? (
+            <Card className="zodiac-description" {...handlers}>
+               <Button onClick={handleBackClick}>Назад</Button>
+               <p>{horoscopes.horoscopes[selectedZodiac]}</p>
+            </Card>
+         ) : (
+            <ul className="horoscope-list">
+               {horoscopes.horoscopes &&
+                  Object.keys(horoscopes.horoscopes).map(zodiac => (
+                     <li key={zodiac}>
+                        <Button onClick={() => handleZodiacClick(zodiac)}>
+                           {zodiac}
+                        </Button>
+                     </li>
+                  ))}
+            </ul>
+         )}
       </div>
    )
 }

@@ -1,0 +1,5 @@
+{
+   "compilerOptions": {},
+   "include": ["**/*.js", "**/*.jsx", "tailwind.config.tsss"],
+   "exclude": ["node_modules"]
+}
