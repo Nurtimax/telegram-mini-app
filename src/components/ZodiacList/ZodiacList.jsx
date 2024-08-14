@@ -1,5 +1,5 @@
 import React, {useState, useCallback, useEffect} from "react"
-import "./ProductList.css"
+import "./ZodiacList.css"
 import axios from "axios"
 import {useSwipeable} from "react-swipeable"
 
@@ -22,12 +22,7 @@ const horoscopeKeys = {
    pisces: "рыбы"
 }
 
-const getTotalPrice = (items = []) => {
-   return items.reduce((acc, item) => (acc += item.price), 0)
-}
-
-const ProductList = () => {
-   const [addedItems, setAddedItems] = useState([])
+const ZodiacList = () => {
    const [horoscope, setHoroscope] = useState({language: "original"})
    const [horoscopes, setHoroscopes] = useState({})
    const [selectedZodiac, setSelectedZodiac] = useState(null)
@@ -66,16 +61,21 @@ const ProductList = () => {
 
    return (
       <div className="product-list-wrapper">
-         <div className="my-4">
+         <div className="my-4 flex justify-between items-center">
             <SelectDemo
                handleChange={handleChange}
                value={horoscope.language}
             />
+            {selectedZodiac && <Button onClick={handleBackClick}>Назад</Button>}
          </div>
 
          {selectedZodiac ? (
             <Card className="zodiac-description p-4" {...handlers}>
-               <Button onClick={handleBackClick}>Назад</Button>
+               <h3 className="text-3xl capitalize">
+                  {horoscope.language === "translated"
+                     ? selectedZodiac
+                     : horoscopeKeys?.[selectedZodiac]}
+               </h3>
                <p>{horoscopes.horoscopes[selectedZodiac]}</p>
             </Card>
          ) : (
@@ -99,4 +99,4 @@ const ProductList = () => {
    )
 }
 
-export default ProductList
+export default ZodiacList
